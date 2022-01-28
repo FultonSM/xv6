@@ -55,6 +55,7 @@ OBJS = \
 	log.o\
 	main.o\
 	mp.o\
+	parse.o\
 	picirq.o\
 	pipe.o\
 	proc.o\
@@ -102,6 +103,8 @@ UPROGS=\
 	_layout\
 	_cpu\
 	_mem\
+	_shell\
+	_hello\
 
 _%: %.o userlib.a
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^

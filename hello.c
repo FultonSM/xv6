@@ -1,8 +1,8 @@
 #include "types.h"
 #include "stat.h"
 #include "user.h"
-#include "parse.h"
 
-int shell(){
+int main(){
+    printf(1,"Hello world\n");
     exit();
 }
