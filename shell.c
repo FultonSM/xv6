@@ -5,19 +5,16 @@
 
 int main(){
     //using shell to copy echo using read
-    char* cptr = malloc(sizeof(char)*12);
-    int gud = read(0,cptr,12);
-    if(gud < 0){
-        printf(2,"error: read error\n");
-        exit();
-    }
+    char* cptr = "hello there > world";
     command cmd;
-    printf(1,"got it, :%s\n",cptr);
-    gud = parse(cptr,&cmd);
+    int gud = parse(cptr,&cmd);
     if(gud == -1){
-        printf(2,"error: parse error\n");
-        exit();
+        printf(2,"Parse Error\n");
     }
-    printf(1,"bg = %d\nargc = %d\n");
+    printf(1,"bg: %d\nargc: %d\n",cmd.bg,cmd.argc);
+    for(int i=0; i<cmd.argc;++i){
+        printf(1,"argv[%d]: %s\n",i,cmd.argv[i]);
+    }
+    printf(1,"input: %s\noutput: %s\n",cmd.input,cmd.output);
     exit();
 }
