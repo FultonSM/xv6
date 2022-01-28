@@ -99,6 +99,9 @@ UPROGS=\
 	_usertests\
 	_wc\
 	_zombie\
+	_layout\
+	_cpu\
+	_mem\
 
 _%: %.o userlib.a
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
