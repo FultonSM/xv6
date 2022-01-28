@@ -55,7 +55,6 @@ OBJS = \
 	log.o\
 	main.o\
 	mp.o\
-	parse.o\
 	picirq.o\
 	pipe.o\
 	proc.o\
@@ -71,6 +70,7 @@ OBJS = \
 	uart.o\
 	vectors.o\
 	vm.o\
+	parse.o\
 
 kernel: $(OBJS) entry.o entryother initcode kernel.ld
 	$(LD) $(LDFLAGS) -T kernel.ld -o kernel entry.o $(OBJS) -b binary initcode entryother
@@ -80,7 +80,7 @@ kernel: $(OBJS) entry.o entryother initcode kernel.ld
 vectors.S: vectors.pl
 	./vectors.pl > vectors.S
 
-userlib.a: ulib.o usys.o printf.o umalloc.o
+userlib.a: ulib.o usys.o printf.o umalloc.o parse.o
 	$(AR) cr $@ $^
 
 ## user-space programs
