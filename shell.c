@@ -8,7 +8,8 @@ int main(){
     char* cptr = malloc(1024);
     int gud = 0;
     int pid = 0;
-    int bkgd = 0;
+    int bkgd[100];
+    int bgps = -1;
 
     while(1){    
         //shell feed line print
@@ -35,17 +36,40 @@ int main(){
         //check if command is exit
         if(strcmp(cmd.argv[0],"exit") == 0){
             //if there is a background process
-            if(bkgd != 0){
-                gud = kill(bkgd);
-                //kill error check
-                if(gud == -1){
-                    printf(2,"Error: kill error\n");
-                    exit();
+            if(bgps != -1){
+                //kill off all bg processes
+                for(; bgps>=0; --bgps){
+                    gud = kill(bkgd[bgps]);
+                    //kill error check
+                    if(gud == -1){
+                        printf(2,"Error: kill error\n");
+                        exit();
+                    }
                 }
+                
             }
             break;
         }
-        //* print parse "function"
+        
+        //check if command is bg
+        if(strcmp(cmd.argv[0],"bg") == 0){
+            for(int i=0; i<=bgps;++i){
+                printf(1,"%d ",bkgd[i]);
+            }
+            printf(1,"\n");
+        }
+
+        //check if command is wait
+        if(strcmp(cmd.argv[0],"wait") == 0){
+            gud = wait();
+            //wait error check
+            if(gud == -1){
+                printf(2,"Error: wait error\n");
+                exit();
+            }
+        }
+        
+        /* print parse "function"
         printf(1,"bg: %d\nargc: %d\n",cmd.bg,cmd.argc);
         for(int i=0; i<cmd.argc;++i){
             printf(1,"argv[%d]: %s\n",i,cmd.argv[i]);
@@ -76,8 +100,9 @@ int main(){
             }
             else{
                 //save background process
-                bkgd = pid;
-                printf(1,"bkgrd=%d\n",bkgd);
+                ++bgps;
+                bkgd[bgps] = pid;
+                //printf(1,"bkgrd=%d\n",bkgd);
             }
         }
         else{
