@@ -7,8 +7,13 @@
 int main(){
     char* cptr = malloc(1024);
     int gud = 0;
+    int pid = 0;
+    int bkgd = 0;
 
     while(1){    
+        //shell feed line print
+        printf(1,"shell>");
+
         gud = read(0,cptr,1024);    //read line
 
         //read error check
@@ -29,9 +34,18 @@ int main(){
 
         //check if command is exit
         if(strcmp(cmd.argv[0],"exit") == 0){
+            //if there is a background process
+            if(bkgd != 0){
+                gud = kill(bkgd);
+                //kill error check
+                if(gud == -1){
+                    printf(2,"Error: kill error\n");
+                    exit();
+                }
+            }
             break;
         }
-        /*
+        //* print parse "function"
         printf(1,"bg: %d\nargc: %d\n",cmd.bg,cmd.argc);
         for(int i=0; i<cmd.argc;++i){
             printf(1,"argv[%d]: %s\n",i,cmd.argv[i]);
@@ -40,21 +54,30 @@ int main(){
         //*/
 
         //calling fork
-        gud = fork();
+        pid = fork();
 
         //fork error check
-        if(gud == -1){
+        if(pid == -1){
             printf(2,"Error: fork error\n");
             exit();
         }
         
+        //* fork exec "function"
         //fork child check
-        if(gud > 0){
-            gud = wait();
-            //wait error check
-            if(gud == -1){
-                printf(2,"Error: wait error\n");
-                exit();
+        if(pid > 0){
+            //checking if background process
+            if(cmd.bg == 0){
+                gud = wait();
+                //wait error check
+                if(gud == -1){
+                    printf(2,"Error: wait error\n");
+                    exit();
+                }
+            }
+            else{
+                //save background process
+                bkgd = pid;
+                printf(1,"bkgrd=%d\n",bkgd);
             }
         }
         else{
@@ -62,6 +85,7 @@ int main(){
             gud = exec(cmd.argv[0],cmd.argv);
             exit();
         }
+        //*/
     }
 
     exit();

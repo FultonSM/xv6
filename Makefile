@@ -105,6 +105,7 @@ UPROGS=\
 	_mem\
 	_shell\
 	_hello\
+	_ten\
 
 _%: %.o userlib.a
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
