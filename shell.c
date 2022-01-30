@@ -68,14 +68,17 @@ int main(){
                 exit();
             }
         }
+        //we now know that we have a file to run
         
-        /* print parse "function"
+        //* print parse "function"
         printf(1,"bg: %d\nargc: %d\n",cmd.bg,cmd.argc);
         for(int i=0; i<cmd.argc;++i){
             printf(1,"argv[%d]: %s\n",i,cmd.argv[i]);
         }
         printf(1,"input: %s\noutput: %s\n\n",cmd.input,cmd.output);
         //*/
+
+
 
         //calling fork
         pid = fork();
@@ -107,6 +110,46 @@ int main(){
         }
         else{
             //if child, execute process
+            //checking for input
+            if(cmd.input != 0){
+                //close standard in
+                gud = close(0);
+
+                //close error check
+                if(gud == -1){
+                    printf(2,"Error: close error\n");
+                    exit();
+                }
+
+                //open file
+                gud = open(cmd.input,O_CREATE | O_RDONLY);
+                //open error check
+                if(gud == -1){
+                    printf(2,"Error: open error\n");
+                    exit();
+                }
+            }
+
+            //checking for output
+            if(cmd.output != 0){
+                //close standard out
+                gud = close(1);
+                //close error check
+                if(gud == -1){
+                    printf(2,"Error: close error\n");
+                    exit();
+                }
+
+                //open file
+                gud = open(cmd.output,O_CREATE | O_WRONLY);
+                //open error check
+                if(gud == -1){
+                    printf(2,"Error: open error\n");
+                    exit();
+                }
+            }
+
+            //execute the file
             gud = exec(cmd.argv[0],cmd.argv);
             exit();
         }
