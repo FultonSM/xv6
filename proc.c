@@ -172,6 +172,29 @@ growproc(int n)
   return 0;
 }
 
+//returns the number of syscalls made by a process
+int
+calls(int pid)
+{
+  struct proc *p;
+    if(pid == 0){
+      p = myproc();
+    }
+    else{
+    acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->pid == pid){
+        break;  //found get out of loop
+      }
+    }
+    release(&ptable.lock);
+  }
+  if(p->pid != pid){
+    return -1;
+  }
+  return p->callnum;
+}
+
 // Create a new process copying p as the parent.
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
