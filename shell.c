@@ -13,7 +13,7 @@ int main(){
 
     while(1){    
         //shell feed line print
-        printf(1,"shell>");
+        printf(1,"shell> ");
 
         gud = read(0,cptr,1024);    //read line
 
@@ -23,18 +23,35 @@ int main(){
             exit();
         }
         
+        //check if any input
+        if(strcmp(cptr,"\n") == 0){
+            continue;
+        }
+
         //parsing the line
         command cmd;
         gud = parse(cptr,&cmd);
 
+        /* print parse "function"
+        printf(1,"bg: %d\nargc: %d\n",cmd.bg,cmd.argc);
+        for(int i=0; i<cmd.argc;++i){
+            printf(1,"argv[%d]: %s\n",i,cmd.argv[i]);
+        }
+        printf(1,"input: %s\noutput: %s\n\n",cmd.input,cmd.output);
+        //*/
+
         //parse error check
         if(gud == -1){
-            printf(2,"error: parse error\n");
+            printf(2,"Error: syntax error in \"%s\"\n",cptr);
             exit();
         }
 
         //check if command is exit
         if(strcmp(cmd.argv[0],"exit") == 0){
+            if((cmd.input != 0) | (cmd.output != 0) | (cmd.argc > 1)){
+                printf(2,"Error: exit usage error\n");
+                continue;
+            }
             //if there is a background process
             if(bgps != -1){
                 //kill off all bg processes
@@ -53,31 +70,44 @@ int main(){
         
         //check if command is bg
         if(strcmp(cmd.argv[0],"bg") == 0){
-            for(int i=0; i<=bgps;++i){
-                printf(1,"%d ",bkgd[i]);
+            //check that it is being used correctly
+            if((cmd.input != 0) | (cmd.output != 0) | (cmd.argc > 1)){
+                printf(2,"Error: bg usage error\n");
+                continue;
             }
-            printf(1,"\n");
+            //check that we have background processes
+            if(bgps != -1){
+                    for(int i=0; i<=bgps;++i){
+                    printf(1,"%d ",bkgd[i]);
+                }
+                printf(1,"\n");
+            }
+            //skip past exec stuff since command was this
+            continue;
         }
 
         //check if command is wait
         if(strcmp(cmd.argv[0],"wait") == 0){
-            gud = wait();
-            //wait error check
-            if(gud == -1){
-                printf(2,"Error: wait error\n");
-                exit();
+            //check that it is being used correctly
+            if((cmd.input != 0) | (cmd.output != 0) | (cmd.argc > 1)){
+                printf(2,"Error: wait usage error\n");
+                continue;
             }
+            //make sure there is something to wait for
+            if(bgps != -1){    
+                //wait
+                gud = wait();
+                //wait error check
+                if(gud == -1){
+                    printf(2,"Error: wait error\n");
+                    exit();
+                }
+            }
+            //skip past exev stuff since command was this
+            continue;
         }
         //we now know that we have a file to run
         
-        //* print parse "function"
-        printf(1,"bg: %d\nargc: %d\n",cmd.bg,cmd.argc);
-        for(int i=0; i<cmd.argc;++i){
-            printf(1,"argv[%d]: %s\n",i,cmd.argv[i]);
-        }
-        printf(1,"input: %s\noutput: %s\n\n",cmd.input,cmd.output);
-        //*/
-
 
 
         //calling fork
@@ -151,6 +181,9 @@ int main(){
 
             //execute the file
             gud = exec(cmd.argv[0],cmd.argv);
+            if(gud == -1){
+                printf(2,"Error: failed to execute %s\n",cmd.argv[0]);
+            }
             exit();
         }
         //*/

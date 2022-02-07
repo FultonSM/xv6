@@ -182,6 +182,8 @@ fork(void)
   struct proc *np;
   struct proc *curproc = myproc();
 
+  //increasing call num
+
   // Allocate process.
   if((np = allocproc()) == 0){
     return -1;
@@ -518,7 +520,7 @@ procdump(void)
       state = states[p->state];
     else
       state = "???";
-    cprintf("%d %s %s", p->pid, state, p->name);
+    cprintf("(%d) %d %s %s",p->callnum, p->pid, state, p->name);
     if(p->state == SLEEPING){
       getcallerpcs((uint*)p->context->ebp+2, pc);
       for(i=0; i<10 && pc[i] != 0; i++)

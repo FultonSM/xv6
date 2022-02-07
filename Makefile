@@ -106,6 +106,7 @@ UPROGS=\
 	_shell\
 	_hello\
 	_ten\
+	_syscalls\
 
 _%: %.o userlib.a
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
