@@ -9,7 +9,8 @@
 
 struct {
   struct spinlock lock;
-  struct proc proc[NPROC];
+  struct proc proc[NPROC];    //this is the array of processes, need 2nd array
+  int priority[NPROC];        //this should be the priority array
 } ptable;
 
 static struct proc *initproc;
