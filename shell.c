@@ -96,7 +96,7 @@ int main(){
             //make sure there is something to wait for
             if(bgps != -1){    
                 //wait
-                gud = wait();
+                gud = wait(0,0);
                 //wait error check
                 if(gud == -1){
                     printf(2,"Error: wait error\n");
@@ -124,7 +124,7 @@ int main(){
         if(pid > 0){
             //checking if background process
             if(cmd.bg == 0){
-                gud = wait();
+                gud = wait(0,0);
                 //wait error check
                 if(gud == -1){
                     printf(2,"Error: wait error\n");

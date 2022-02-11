@@ -10,7 +10,6 @@
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];    //this is the array of processes, need 2nd array
-  int priority[NPROC];        //this should be the priority array
 } ptable;
 
 static struct proc *initproc;
@@ -88,7 +87,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-
+  p->priority = 10000;
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -245,7 +244,7 @@ fork(void)
 
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
-// until its parent calls wait() to find out it exited.
+// until its parent calls wait(0,0) to find out it exited.
 void
 exit(void)
 {
@@ -271,7 +270,7 @@ exit(void)
 
   acquire(&ptable.lock);
 
-  // Parent might be sleeping in wait().
+  // Parent might be sleeping in wait(0,0).
   wakeup1(curproc->parent);
 
   // Pass abandoned children to init.
@@ -292,8 +291,10 @@ exit(void)
 // Wait for a child process to exit and return its pid.
 // Return -1 if this process has no children.
 int
-wait(void)
+wait(int *ticks,int *priority)
 {
+  if(ticks != 0)
+    *ticks = 0;
   struct proc *p;
   int havekids, pid;
   struct proc *curproc = myproc();
@@ -306,6 +307,8 @@ wait(void)
       if(p->parent != curproc)
         continue;
       havekids = 1;
+      if(priority != 0)
+        *priority = p->priority;
       if(p->state == ZOMBIE){
         // Found one.
         pid = p->pid;
