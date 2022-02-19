@@ -23,7 +23,14 @@ sys_exit(void)
 int
 sys_wait(void)
 {
-  return wait(0,0);
+  int *tckptr, *prtyptr;
+
+  if(argptr(0, (void*)&tckptr, 2*sizeof(tckptr[0])) < 0)
+    return -1;
+  if(argptr(1, (void*)&prtyptr, 2*sizeof(prtyptr[0])) < 0)
+    return -1;
+
+  return wait(tckptr,prtyptr);
 }
 
 int

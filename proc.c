@@ -293,8 +293,9 @@ exit(void)
 int
 wait(int *ticks,int *priority)
 {
-  if(ticks != 0)
-    *ticks = 0;
+  if(ticks != 0){
+    *ticks = 442200;
+  }
   struct proc *p;
   int havekids, pid;
   struct proc *curproc = myproc();
@@ -307,8 +308,9 @@ wait(int *ticks,int *priority)
       if(p->parent != curproc)
         continue;
       havekids = 1;
-      if(priority != 0)
+      if(priority != 0){
         *priority = p->priority;
+      }
       if(p->state == ZOMBIE){
         // Found one.
         pid = p->pid;
