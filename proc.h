@@ -50,6 +50,7 @@ struct proc {
   char name[16];               // Process name (debugging)
   int callnum;                 // Number of system calls this process hase performed
   int priority;                // The priority of the process
+  int ticks;                   // The tick count, ammount of times it has the chance to run
 };
 
 // Process memory is laid out contiguously, low addresses first:

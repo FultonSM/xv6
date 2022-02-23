@@ -9,7 +9,7 @@
 
 struct {
   struct spinlock lock;
-  struct proc proc[NPROC];    //this is the array of processes, need 2nd array
+  struct proc proc[NPROC];    //this is the array of processes
 } ptable;
 
 static struct proc *initproc;
@@ -88,6 +88,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->priority = 10000;
+  p->ticks = 0;
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -293,9 +294,7 @@ exit(void)
 int
 wait(int *ticks,int *priority)
 {
-  if(ticks != 0){
-    *ticks = 442200;
-  }
+  
   struct proc *p;
   int havekids, pid;
   struct proc *curproc = myproc();
@@ -309,7 +308,6 @@ wait(int *ticks,int *priority)
         continue;
       havekids = 1;
       if(priority != 0){
-        *priority = p->priority;
       }
       if(p->state == ZOMBIE){
         // Found one.
@@ -322,6 +320,12 @@ wait(int *ticks,int *priority)
         p->name[0] = 0;
         p->killed = 0;
         p->state = UNUSED;
+        if(ticks != 0){
+          *ticks = p->ticks;
+        }
+        if(priority != 0){
+          *priority = p->priority;
+        }
         release(&ptable.lock);
         return pid;
       }
@@ -355,16 +359,19 @@ scheduler(void)
   for(;;){
     // Enable interrupts on this processor.
     sti();
-
+    int biggust = 0;
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
+    
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
+      if(p->priority != biggust)
         continue;
-
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
+      // decrease priority and increase ticks
+      p->ticks++;
+      p->priority--;
       c->proc = p;
       switchuvm(p);
       p->state = RUNNING;
