@@ -294,7 +294,8 @@ exit(void)
 int
 wait(int *ticks,int *priority)
 {
-  
+  if(ticks != 0)
+    *ticks = 0;
   struct proc *p;
   int havekids, pid;
   struct proc *curproc = myproc();
@@ -307,8 +308,8 @@ wait(int *ticks,int *priority)
       if(p->parent != curproc)
         continue;
       havekids = 1;
-      if(priority != 0){
-      }
+      if(priority != 0)
+        *priority = p->priority;
       if(p->state == ZOMBIE){
         // Found one.
         pid = p->pid;
@@ -359,12 +360,12 @@ scheduler(void)
   for(;;){
     // Enable interrupts on this processor.
     sti();
-    int biggust = 0;
+    //int biggust = 0;
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->priority != biggust)
+      if(p->state != RUNNABLE)
         continue;
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it

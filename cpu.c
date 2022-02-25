@@ -23,8 +23,6 @@ int main(int argc,char *argv[])
   }
 
   int pid,level,ticks;
-  level = 6969;
-  ticks = 420;
   for(int i=0; i<N; i++){
     if((pid=wait(&ticks,&level)) < 0)
       exit();
