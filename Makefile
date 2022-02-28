@@ -112,6 +112,12 @@ UPROGS=\
 _%: %.o userlib.a
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
 
+decrypt.o: decrypt.c 
+	$(CC) $(CFLAGS) -c $^
+
+_decrypt: decrypt.o setup.o userlib.a
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+
 ## file system disk image
 
 fs.img: mkfs README $(UPROGS)
