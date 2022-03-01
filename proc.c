@@ -354,6 +354,7 @@ void
 scheduler(void)
 {
   struct proc *p;
+  struct proc *x;
   struct cpu *c = mycpu();
   c->proc = 0;
   
@@ -363,14 +364,30 @@ scheduler(void)
     //int biggust = 0;
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    
+    int next = 0;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
+      for(x = ptable.proc; x < &ptable.proc[NPROC]; x++){
+        //find the biggest priority
+        if(x->state != RUNNABLE)
+          continue;
+        else if(next < x->priority)
+          next = x->priority;
+      }
+      for(x = ptable.proc; x < &ptable.proc[NPROC]; x++){
+        //find the process with that priority
+        if(x->priority == next)
+          break;
+      }
+      p = x;
+      next = 0;
+      
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
       // decrease priority and increase ticks
+      
+      // this is prints out the ticks and priority for processes when scheduled.
+      cprintf("%d: ticks: %d, priority: %d\n",p->pid,p->ticks,p->priority);
       p->ticks++;
       p->priority--;
       c->proc = p;
